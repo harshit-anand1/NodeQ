@@ -1,7 +1,7 @@
 const Redis = require('ioredis');
 const { v4 : uuidv4} = require('uuid');
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:379');
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 async function enqueue(job) {
     const jobId = uuidv4();
@@ -19,7 +19,8 @@ async function enqueue(job) {
     //storing the metadata
     await redis.hset(`job:${jobId}`, jobData);
 
+    console.log('Enqueue job:', jobData);
     return jobId;
 }
 
-module.exports = { enqueueJob, redis};
+module.exports = { enqueue, redis};

@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 //const {v4 : uuidv4} = require('uuid');
-const {enqueueJob} = require('../queue/index.js');
+const {enqueue} = require('../queue');
 
 const app = express();
 app.use(bodyParser.json());
@@ -16,7 +16,7 @@ app.post('/submit', async (req,res)=>{
     }
 
     //const jobId = uuidv4();
-    const jobId = await enqueueJob({type,payload});
+    const jobId = await enqueue({type,payload});
 
 
     //for now just log it later to redis
