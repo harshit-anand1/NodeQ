@@ -45,7 +45,7 @@ try{
     }
     else {
         await redis.hset(jobKey, 'status', 'failed');
-        console.log('`Max Retries exhausted for job ${jobData.id}. End of attempts');
+        console.log(`Max Retries exhausted for job ${jobData.id}. End of attempts`);
     }
 
 }
