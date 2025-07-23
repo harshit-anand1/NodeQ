@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 //const {v4 : uuidv4} = require('uuid');
-const {enqueue} = require('../queue');
+const {enqueue, fetchStatus} = require('../queue');
 
 const app = express();
 app.use(bodyParser.json());
