@@ -19,16 +19,21 @@ async function enqueue(job) {
         priority: job.priority
     };
 
+    //Adding the job id to a redis list
+    
     //push to job queue
-   if(job.priority==='high'){   
-    await redis.lpush('job', JSON.stringify(jobData));
-   }
-   else{
-    await redis.rpush('job', JSON.stringify(jobData));
-
-   }
+    if(job.priority==='high'){   
+        await redis.lpush('job', JSON.stringify(jobData));
+    }
+    else{
+        await redis.rpush('job', JSON.stringify(jobData));
+        
+    }
     //storing the metadata
+    
     await redis.hset(`job:${jobId}`, Object.entries(jobData).flat());
+    await redis.lpush('job:ids', jobId);
+    await redis.ltrim('job:ids',0,99); //keeping only last 100 jobs
 
     console.log('Enqueue job:', jobData);
     return jobId;

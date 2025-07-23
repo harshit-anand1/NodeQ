@@ -1,4 +1,10 @@
 const { redis } = require('../queue');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+
+const app = express();
+app.use(bodyParser.json());
 
 app.get('/jobs', async (req,res)=>{
     try{
@@ -18,11 +24,11 @@ app.get('/jobs', async (req,res)=>{
 });
 
 app.get('/job/:id', async (req,res)=>{
+    const jobId = req.params.id;
     try{
-        const jobId = req.params.id;
-        const job= await redis.hgetall(`job"${jobId}`);
+        const job= await redis.hgetall(`job:${jobId}`);
 
-        if(Object.keys(job).length==0){
+        if(Object.keys(job).length===0){
             return res.status(404).json({error: 'Job Not Found'});
         }
         res.json(job);
@@ -30,4 +36,11 @@ app.get('/job/:id', async (req,res)=>{
         console.error('Erro fetching job:', err);
         res.status(500).json({error: 'Failed to fetch job'});
     }
+});
+
+
+
+const PORT = 4000;
+app.listen(PORT, ()=>{
+    console.log(`Dashboard API listening on ${PORT}`);
 });
