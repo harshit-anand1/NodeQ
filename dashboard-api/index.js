@@ -15,13 +15,16 @@ app.get('/jobs', async (req,res)=>{
     try{
         const keys = await redis.keys('job:*');
         const jobs =[];
+        const statusFilter = req.query.status;
 
         for (const key of keys){
             if (key === 'job' || key === 'job:ids') continue;
             
             const job = await redis.hgetall(key);
             if (job && Object.keys(job).length > 0) {
+                if(!statusFilter || job.status === statusFilter){
                 jobs.push(job);
+                }
             }
         }
 
