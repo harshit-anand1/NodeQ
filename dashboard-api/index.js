@@ -1,9 +1,14 @@
 const { redis } = require('../queue');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
+
 
 
 const app = express();
+app.use(cors({
+    origin: 'http://localhost:5173'
+  }));
 app.use(bodyParser.json());
 
 app.get('/jobs', async (req,res)=>{
@@ -12,9 +17,16 @@ app.get('/jobs', async (req,res)=>{
         const jobs =[];
 
         for (const key of keys){
+            if (key === 'job' || key === 'job:ids') continue;
+            
             const job = await redis.hgetall(key);
-            jobs.push(job);
+            if (job && Object.keys(job).length > 0) {
+                jobs.push(job);
+            }
         }
+
+        //sorted jobs by createdAt asc
+        jobs.sort((a,b) => b.createdAt - a.createdAt);
 
         res.json(jobs);
     } catch (err){
