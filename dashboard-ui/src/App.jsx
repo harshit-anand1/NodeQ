@@ -9,7 +9,7 @@ function App() {
     <div style={{ padding: '2rem' }}>
       <h2>📋 Job Queue Dashboard</h2>
       <Routes>
-        <Route path="/" element={<JobList />} />
+        <Route path="/jobs" element={<JobList />} />
         <Route path="/job/:jobId" element={<JobDetail />} />
       </Routes>
     </div>

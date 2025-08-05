@@ -2,6 +2,8 @@ const { redis } = require('../queue');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
+
 
 
 
@@ -52,6 +54,35 @@ app.get('/job/:id', async (req,res)=>{
         res.status(500).json({error: 'Failed to fetch job'});
     }
 });
+
+
+app.post('/job/:id/retry', async (req, res) => {
+    const jobId = req.params.id;
+  
+    try {
+      const oldJob = await redis.hgetall(`job:${jobId}`);
+      if (!oldJob || Object.keys(oldJob).length === 0) {
+        return res.status(404).json({ error: 'Original job not found' });
+      }
+  
+      const newJobId = uuidv4();
+      const newJob = {
+        id: newJobId,
+        type: oldJob.type,
+        status: 'queued',
+        createdAt: Date.now().toString(),
+      };
+  
+      await redis.rpush('job:queue', JSON.stringify(newJob));
+      await redis.hset(`job:${newJobId}`, newJob);
+  
+      res.json({ message: 'Job retried successfully', job: newJob });
+    } catch (err) {
+      console.error('Error retrying job:', err);
+      res.status(500).json({ error: 'Failed to retry job' });
+    }
+  });
+  
 
 
 

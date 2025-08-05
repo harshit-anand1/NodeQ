@@ -11,6 +11,18 @@ function JobDetail() {
     fetchJob();
   }, []);
 
+  const handleRetry = async () => {
+    try {
+      const response = await axios.post(`http://localhost:4000/job/${job.id}/retry`);
+      alert('Retry submitted with new ID: ' + response.data.job.id);
+    } catch (err) {
+      console.error('Failed to retry job:', err);
+      alert('Retry failed');
+    }
+  };
+ 
+
+
   const fetchJob = async () => {
     try {
       const response = await axios.get(`http://localhost:4000/job/${jobId}`);
@@ -36,8 +48,15 @@ function JobDetail() {
           ))}
         </tbody>
       </table>
+
+            
+      {job.status === 'failed' && (
+  <button onClick={handleRetry}>Retry Job</button>
+    )}
+
     </div>
   );
 }
+
 
 export default JobDetail;
